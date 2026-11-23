@@ -32,7 +32,7 @@
 // SSE + SSE2 (don't include intrin.h!)
 #include <emmintrin.h>
 
-#if defined _MSC_VER && !(defined NV_SIMD_USE_NAMESPACE && NV_SIMD_USE_NAMESPACE)
+#if defined _MSC_VER && !defined(__clang__) && !(defined NV_SIMD_USE_NAMESPACE && NV_SIMD_USE_NAMESPACE)
 
 // SIMD libarary lives in global namespace and Simd4f is
 // typedef'd  to __m128 so it can be passed by value on MSVC.

@@ -86,19 +86,21 @@ uint32_t getAvxSupport()
 	if ((cpuInfo[2] & fmaFlags) != fmaFlags)
 		return 1; // no FMA3 support
 
-	/* only using fma at the moment, don't lock out AMD's piledriver by requiring avx2
-	__cpuid(cpuInfo, 7);
+	__cpuid(cpuInfo, 0);
+	if (cpuInfo[0] < 7)
+		return 1;
+
+	__cpuidex(cpuInfo, 7, 0);
 	int avx2Flags = 1 << 5;
 	if ((cpuInfo[1] & avx2Flags) != avx2Flags)
-	    return 1; // no AVX2 support
-	*/
+		return 1; // no AVX2 support
 
 	return 2;
 #endif // _MSC_VER
 #endif // _MSC_FULL_VER
 }
 
-const uint32_t sAvxSupport = getAvxSupport(); // 0: no AVX, 1: AVX, 2: AVX+FMA
+const uint32_t sAvxSupport = getAvxSupport(); // 0: no AVX, 1: AVX, 2: AVX2+FMA
 }
 #endif
 

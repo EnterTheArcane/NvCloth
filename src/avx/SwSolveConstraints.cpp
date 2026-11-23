@@ -64,11 +64,17 @@ __m256 fnmadd_ps(__m256 a, __m256 b, __m256 c)
 }
 #if _MSC_VER >= 1700
 template <>
+#if defined(__clang__)
+__attribute__((target("fma")))
+#endif
 __m256 fmadd_ps<2>(__m256 a, __m256 b, __m256 c)
 {
 	return _mm256_fmadd_ps(a, b, c);
 }
 template <>
+#if defined(__clang__)
+__attribute__((target("fma")))
+#endif
 __m256 fnmadd_ps<2>(__m256 a, __m256 b, __m256 c)
 {
 	return _mm256_fnmadd_ps(a, b, c);
@@ -130,6 +136,9 @@ __m256 exp2(const __m256& v)
 #if _MSC_VER >= 1700
 //AVX2
 template <>
+#if defined(__clang__)
+__attribute__((target("avx2")))
+#endif
 __m256 exp2<2>(const __m256& v)
 {
 	// http://www.netlib.org/cephes/

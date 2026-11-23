@@ -52,7 +52,7 @@ uint32_t findBitSet(uint32_t mask)
 {
 #if defined(_MSC_VER)
 	unsigned long result;
-	_BitScanForward(&result, unsigned long(mask));
+	_BitScanForward(&result, static_cast<unsigned long>(mask));
 	return result;
 #else
 	return __builtin_ffs(mask) - 1;
