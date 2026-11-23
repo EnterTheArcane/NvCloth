@@ -39,9 +39,9 @@ using namespace nv;
 cloth::CuClothData::CuClothData(CuCloth& cloth)
 {
 	mNumParticles = cloth.mNumParticles;
-	mParticles = array(*cloth.mParticles.begin().get());
+	mParticles = reinterpret_cast<float*>(cloth.mParticles.begin().get());
 
-	mParticlesHostCopy = array(*getDevicePointer(cloth.mParticlesHostCopy));
+	mParticlesHostCopy = reinterpret_cast<float*>(getDevicePointer(cloth.mParticlesHostCopy));
 
 	mNumPhases = uint32_t(cloth.mPhaseConfigs.size());
 	mPhaseConfigs = cloth.mPhaseConfigs.begin().get();
@@ -68,8 +68,8 @@ cloth::CuClothData::CuClothData(CuCloth& cloth)
 
 	mVirtualParticleSetSizesBegin = cloth.mVirtualParticleSetSizes.begin().get();
 	mVirtualParticleSetSizesEnd = mVirtualParticleSetSizesBegin + cloth.mVirtualParticleSetSizes.size();
-	mVirtualParticleIndices = array(*cloth.mVirtualParticleIndices.begin().get());
-	mVirtualParticleWeights = array(*cloth.mVirtualParticleWeights.begin().get());
+	mVirtualParticleIndices = reinterpret_cast<const uint16_t*>(cloth.mVirtualParticleIndices.begin().get());
+	mVirtualParticleWeights = reinterpret_cast<const float*>(cloth.mVirtualParticleWeights.begin().get());
 
 	mEnableContinuousCollision = cloth.mEnableContinuousCollision;
 	mCollisionMassScale = cloth.mCollisionMassScale;
@@ -131,59 +131,60 @@ cloth::CuFrameData::CuFrameData(CuCloth& cloth, uint32_t numSharedPositions, con
 	mTargetMotionConstraints = 0;
 	if (!cloth.mMotionConstraints.mStart.empty())
 	{
-		mTargetMotionConstraints = array(*cloth.mMotionConstraints.mStart.begin().get());
+		mTargetMotionConstraints = reinterpret_cast<float*>(cloth.mMotionConstraints.mStart.begin().get());
 	}
 
 	mStartMotionConstraints = mTargetMotionConstraints;
 	if (!cloth.mMotionConstraints.mTarget.empty())
 	{
-		mTargetMotionConstraints = array(*cloth.mMotionConstraints.mTarget.begin().get());
+		mTargetMotionConstraints = reinterpret_cast<float*>(cloth.mMotionConstraints.mTarget.begin().get());
 	}
 
-	mHostMotionConstraints = array(*getDevicePointer(cloth.mMotionConstraints.mHostCopy));
+	mHostMotionConstraints = reinterpret_cast<const float*>(getDevicePointer(cloth.mMotionConstraints.mHostCopy));
 
 	mTargetSeparationConstraints = 0;
 	if (!cloth.mSeparationConstraints.mStart.empty())
 	{
-		mTargetSeparationConstraints = array(*cloth.mSeparationConstraints.mStart.begin().get());
+		mTargetSeparationConstraints = reinterpret_cast<float*>(cloth.mSeparationConstraints.mStart.begin().get());
 	}
 
 	mStartSeparationConstraints = mTargetSeparationConstraints;
 	if (!cloth.mSeparationConstraints.mTarget.empty())
 	{
-		mTargetSeparationConstraints = array(*cloth.mSeparationConstraints.mTarget.begin().get());
+		mTargetSeparationConstraints = reinterpret_cast<float*>(cloth.mSeparationConstraints.mTarget.begin().get());
 	}
 
-	mHostSeparationConstraints = array(*getDevicePointer(cloth.mSeparationConstraints.mHostCopy));
+	mHostSeparationConstraints = reinterpret_cast<const float*>(getDevicePointer(cloth.mSeparationConstraints.mHostCopy));
 
 	mParticleAccelerations = 0;
 	if (!cloth.mParticleAccelerations.empty())
 	{
-		mParticleAccelerations = array(*cloth.mParticleAccelerations.begin().get());
+		mParticleAccelerations = reinterpret_cast<float*>(cloth.mParticleAccelerations.begin().get());
 	}
 
-	mHostParticleAccelerations = array(*getDevicePointer(cloth.mParticleAccelerationsHostCopy));
+	mHostParticleAccelerations = reinterpret_cast<const float*>(getDevicePointer(cloth.mParticleAccelerationsHostCopy));
 
 	mRestPositions = 0;
 	if (!cloth.mRestPositions.empty())
 	{
-		mRestPositions = array(*cloth.mRestPositions.begin().get());
+		mRestPositions = reinterpret_cast<const float*>(cloth.mRestPositions.begin().get());
 	}
 
-	mStartCollisionSpheres = array(*getDevicePointer(cloth.mStartCollisionSpheres));
-	mTargetCollisionSpheres = array(*getDevicePointer(cloth.mTargetCollisionSpheres));
+	// Empty collision buffers have no device address.
+	mStartCollisionSpheres = reinterpret_cast<const float*>(getDevicePointer(cloth.mStartCollisionSpheres));
+	mTargetCollisionSpheres = reinterpret_cast<const float*>(getDevicePointer(cloth.mTargetCollisionSpheres));
 
 	if (!mTargetCollisionSpheres)
 		mTargetCollisionSpheres = mStartCollisionSpheres;
 
-	mStartCollisionPlanes = array(*getDevicePointer(cloth.mStartCollisionPlanes));
-	mTargetCollisionPlanes = array(*getDevicePointer(cloth.mTargetCollisionPlanes));
+	mStartCollisionPlanes = reinterpret_cast<const float*>(getDevicePointer(cloth.mStartCollisionPlanes));
+	mTargetCollisionPlanes = reinterpret_cast<const float*>(getDevicePointer(cloth.mTargetCollisionPlanes));
 
 	if (!mTargetCollisionPlanes)
 		mTargetCollisionPlanes = mStartCollisionPlanes;
 
-	mStartCollisionTriangles = array(*getDevicePointer(cloth.mStartCollisionTriangles));
-	mTargetCollisionTriangles = array(*getDevicePointer(cloth.mTargetCollisionTriangles));
+	mStartCollisionTriangles = reinterpret_cast<const float*>(getDevicePointer(cloth.mStartCollisionTriangles));
+	mTargetCollisionTriangles = reinterpret_cast<const float*>(getDevicePointer(cloth.mTargetCollisionTriangles));
 
 	if (!mTargetCollisionTriangles)
 		mTargetCollisionTriangles = mStartCollisionTriangles;

@@ -30,6 +30,8 @@
 #pragma once
 #include "NvCloth/Cloth.h"
 
+#include <cstring>
+
 namespace nv
 {
 namespace cloth
@@ -59,11 +61,12 @@ struct Parameter
 	Parameter() {}
 	Parameter(Parameter const & other)
 	{
-		memcpy(this, &other, sizeof(Parameter));
+		std::memcpy(this, &other, sizeof(Parameter));
 	}
 	Parameter& operator=(Parameter const & other)
 	{
-		memcpy(this, &other, sizeof(Parameter));
+		std::memcpy(this, &other, sizeof(Parameter));
+		return *this;
 	}
 
 	int mParameterId;

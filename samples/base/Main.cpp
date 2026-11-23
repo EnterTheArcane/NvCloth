@@ -30,7 +30,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	SampleConfig config;
 	config.sampleName = L"NvCloth Samples Viewer";
-	//config.additionalResourcesDir.push_back(alternatePathArg.getValue().c_str());
+	config.additionalResourcesDir.emplace_back(NVCLOTH_SAMPLE_RESOURCE_DIR);
 
 	int result = runSample(config);
 

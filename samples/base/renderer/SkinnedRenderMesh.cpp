@@ -15,7 +15,7 @@
 
 SkinnedRenderMesh::SkinnedRenderMesh(const std::vector<const SimpleMesh*>& meshes)
 {
-	NV_CLOTH_ASSERT_WITH_MESSAGE(meshes.size() <= MeshesCountMax, "meshes.size() have to be <= SkinnedRenderMesh::MeshesCountMax");
+	NV_CLOTH_ASSERT_WITH_MESSAGE("Too many meshes for SkinnedRenderMesh", meshes.size() <= MeshesCountMax);
 
 	m_device = GetDeviceManager()->GetDevice();
 

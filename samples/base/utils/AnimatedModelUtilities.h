@@ -11,9 +11,9 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <PxVec4.h>
-#include <PxVec3.h>
-#include <PxMat44.h>
+#include <foundation/PxMat44.h>
+#include <foundation/PxVec3.h>
+#include <foundation/PxVec4.h>
 class Model;
 class Scene;
 

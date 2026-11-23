@@ -31,6 +31,7 @@
 #include "CuClothData.h"
 #include "CuPhaseConfig.h"
 
+#include <cstdint>
 #include <new> // placement new
 
 /*
@@ -49,7 +50,7 @@
 // Converting pointers to shared/global addresses is faster than doing generic loads on SM50
 #define CONVERT_ADDRESSES (__CUDA_ARCH__ >= 500)
 
-#if !defined(_WIN64) && !defined(__x86_64__)
+#if UINTPTR_MAX == UINT32_MAX
 #define POINTER_CONSTRAINT "r"
 #define POINTER_TYPE "u32"
 #else
@@ -58,6 +59,7 @@
 #endif
 
 #ifndef __CUDA_ARCH__
+#undef assert
 #define assert(x)
 #endif
 

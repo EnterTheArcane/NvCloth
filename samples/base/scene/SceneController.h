@@ -20,7 +20,9 @@
 #include "JobManager.h"
 
 #include "ClothRenderMesh.h"
+#if USE_CUDA
 #include <cuda.h>
+#endif
 #include "CallbackImplementations.h"
 
 namespace nv
@@ -126,8 +128,10 @@ private:
 
 	nv::cloth::Factory*			mFactories[3];
 	int							mActivePlatform;
+#if USE_CUDA
 	bool						mCUDAInitialized;
 	CUcontext					mCUDAContext;
+#endif
 	bool						mDXInitialized;
 	ID3D11Device*				mDXDevice;
 	ID3D11DeviceContext*		mDXDeviceContext;

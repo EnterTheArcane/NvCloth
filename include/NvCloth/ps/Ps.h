@@ -32,7 +32,10 @@
 
 /*! \file top level include file for shared foundation */
 
-#include "foundation/Px.h"
+#include <foundation/PxSimpleTypes.h>
+
+#include <cstdlib>
+#include <cstring>
 
 /**
 Platform specific defines
@@ -52,8 +55,6 @@ Platform specific defines
 #else
 #define PX_DEBUG_EXP(x)
 #endif
-
-#define PX_SIGN_BITMASK 0x80000000
 
 /** \brief NVidia namespace */
 namespace nv

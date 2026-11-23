@@ -41,14 +41,6 @@
 
 using namespace physx;
 
-namespace nv
-{
-namespace cloth
-{
-bool neonSolverKernel(SwCloth const&, SwClothData&, SwKernelAllocator&, IterationStateFactory&);
-}
-}
-
 using namespace nv;
 using namespace cloth;
 #if NV_SIMD_SIMD
@@ -301,15 +293,7 @@ void cloth::SwSolver::SimulatedCloth::Simulate()
 	SwKernelAllocator allocator(mScratchMemory, uint32_t(mScratchMemorySize));
 
 	// construct kernel functor and execute
-#if NV_ANDROID
-	if (!neonSolverKernel(*mCloth, data, allocator, factory))
-	{
-		//NV_CLOTH_LOG_WARNING("No NEON CPU support detected. Falling back to scalar types.");
-		SwSolverKernel<Scalar4f>(*mCloth, data, allocator, factory)();
-	}
-#else
 	SwSolverKernel<Simd4fType>(*mCloth, data, allocator, factory)();
-#endif
 
 	data.reconcile(*mCloth); // update cloth
 }

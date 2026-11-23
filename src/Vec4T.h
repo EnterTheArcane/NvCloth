@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include <foundation/PxMat33.h>
+#include <foundation/PxMat44.h>
 #include <foundation/PxVec3.h>
 #include <foundation/PxVec4.h>
 

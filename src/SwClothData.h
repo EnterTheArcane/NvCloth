@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <foundation/Px.h>
+#include <cstdint>
 
 namespace nv
 {

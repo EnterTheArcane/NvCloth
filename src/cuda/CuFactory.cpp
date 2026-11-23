@@ -34,8 +34,9 @@
 #include "../ClothImpl.h"
 #include "CuCheckSuccess.h"
 #include "CuContextLock.h"
+#include "NvClothCudaKernel.h"
+
 #include <cuda.h>
-#include "CuSolverKernelBlob.h"
 
 #if PX_VC
 #pragma warning(disable : 4061 4062) // enumerator 'identifier' in switch of enum 'enumeration' is not handled

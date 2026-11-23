@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <string>
 #include <vector>
 #include <foundation/PxVec3.h>
 #include <foundation/PxVec2.h>

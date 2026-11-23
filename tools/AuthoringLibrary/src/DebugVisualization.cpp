@@ -179,7 +179,7 @@ void VisualizeConstraints(Cloth* cloth_, AddLineCallback addLineCallback, int vi
 				continue;
 			}
 
-			for(iIt; iIt < iEnd; iIt += 2)
+			for(; iIt < iEnd; iIt += 2)
 			{
 				float c = (float)(iIt - iStart) / (float)(iEnd - iStart);
 

@@ -694,7 +694,7 @@ IRenderMesh* Renderer::getPrimitiveRenderMesh(PrimitiveRenderMeshType::Enum type
 			m_primitiveRenderMeshes[type] = new SphereRenderMesh();
 			break;
 		default:
-			NV_CLOTH_ASSERT_WITH_MESSAGE(false,"Unsupported PxGeometryType");
+			NV_CLOTH_ASSERT_WITH_MESSAGE("Unsupported PxGeometryType", false);
 			return NULL;
 		}
 	}

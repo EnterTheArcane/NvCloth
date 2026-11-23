@@ -35,6 +35,8 @@
 #include "PsBasicTemplates.h"
 #include "NvCloth/ps/PsAllocator.h"
 
+#include <new>
+
 /** \brief NVidia namespace */
 namespace nv
 {
@@ -307,7 +309,7 @@ class Array : protected Alloc
 		if(capacity() <= mSize)
 			return growAndPushBack(a);
 
-		PX_PLACEMENT_NEW(reinterpret_cast<void*>(mData + mSize), T)(a);
+		new (reinterpret_cast<void*>(mData + mSize)) T(a);
 
 		return mData[mSize++];
 	}
@@ -686,7 +688,7 @@ PX_NOINLINE T& Array<T, Alloc>::growAndPushBack(const T& a)
 
 	// inserting element before destroying old array
 	// avoids referencing destroyed object when duplicating array element.
-	PX_PLACEMENT_NEW(reinterpret_cast<void*>(newData + mSize), T)(a);
+	new (reinterpret_cast<void*>(newData + mSize)) T(a);
 
 	destroy(mData, mData + mSize);
 	if(!isInUserMemory())

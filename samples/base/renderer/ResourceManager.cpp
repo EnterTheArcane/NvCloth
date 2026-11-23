@@ -58,7 +58,7 @@ const Resource* ResourceManager::requestResource(ResourceType type, const char* 
 		}
 		else
 		{
-			NV_CLOTH_ASSERT_WITH_MESSAGE(false,name);
+			NV_CLOTH_ASSERT_WITH_MESSAGE(name, false);
 		}
 	}
 	else if (type == eTEXTURE)
@@ -85,7 +85,7 @@ const Resource* ResourceManager::requestResource(ResourceType type, const char* 
 			}
 			else
 			{
-				NV_CLOTH_ASSERT_WITH_MESSAGE(false,"Unsupported texture extension");
+				NV_CLOTH_ASSERT_WITH_MESSAGE("Unsupported texture extension", false);
 			}
 			resource = textureResource;
 		}
@@ -98,7 +98,7 @@ const Resource* ResourceManager::requestResource(ResourceType type, const char* 
 	}
 	else
 	{
-		NV_CLOTH_ASSERT_WITH_MESSAGE(false,name);
+			NV_CLOTH_ASSERT_WITH_MESSAGE(name, false);
 		return nullptr;
 	}
 }

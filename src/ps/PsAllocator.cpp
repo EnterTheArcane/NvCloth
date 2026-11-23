@@ -25,68 +25,31 @@
 //
 // Copyright (c) 2008-2020 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
-// Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
+// Copyright (c) 2001-2004 NovodeX AG. All rights reserved.
 
+#include "NvCloth/ps/PsAllocator.h"
+#include "NvCloth/Callbacks.h"
 
-#ifndef PX_PHYSICS_COMMON_NX
-#define PX_PHYSICS_COMMON_NX
-
-/** \addtogroup common 
-@{ */
-
-#include "foundation/Px.h"
-
-
-// define API function declaration (public API only needed because of extensions)
-#if defined PX_PHYSX_STATIC_LIB || defined PX_PHYSX_CORE_STATIC_LIB
-	#define PX_PHYSX_CORE_API
-#else
-	#if PX_WINDOWS
-		#if defined PX_PHYSX_CORE_EXPORTS
-			#define PX_PHYSX_CORE_API __declspec(dllexport)
-		#else
-			#define PX_PHYSX_CORE_API __declspec(dllimport)
-		#endif
-	#elif PX_UNIX_FAMILY
-		#define PX_PHYSX_CORE_API PX_UNIX_EXPORT
-    #else
-		#define PX_PHYSX_CORE_API
-    #endif
-#endif
-
-#if PX_WINDOWS && !defined(__CUDACC__)
-	#if defined PX_PHYSX_COMMON_EXPORTS
-		#define PX_PHYSX_COMMON_API __declspec(dllexport)
-	#else
-		#define PX_PHYSX_COMMON_API __declspec(dllimport)
-	#endif
-#elif PX_UNIX_FAMILY
-	#define PX_PHYSX_COMMON_API PX_UNIX_EXPORT
-#else
-	#define PX_PHYSX_COMMON_API
-#endif
-
-// Changing these parameters requires recompilation of the SDK
-
-#if !PX_DOXYGEN
-namespace physx
+/** \brief NVidia namespace */
+namespace nv
 {
-#endif
-	class PxCollection;
-	class PxBase;
+/** \brief nvcloth namespace */
+namespace cloth
+{
+namespace ps
+{
+void* Allocator::allocate(size_t size, const char* file, int line)
+{
+	if(!size)
+		return 0;
+	return GetNvClothAllocator()->allocate(size, "", file, line);
+}
+void Allocator::deallocate(void* ptr)
+{
+	if(ptr)
+		GetNvClothAllocator()->deallocate(ptr);
+}
 
-	class PxHeightField;
-	class PxHeightFieldDesc;
-
-	class PxTriangleMesh;
-	class PxConvexMesh;
-
-	typedef PxU32 PxTriangleID;
-	typedef PxU16 PxMaterialTableIndex;
-
-#if !PX_DOXYGEN
-} // namespace physx
-#endif
-
-/** @} */
-#endif
+} // namespace ps
+} // namespace cloth
+} // namespace nv

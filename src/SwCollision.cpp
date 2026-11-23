@@ -46,10 +46,10 @@ using namespace cloth;
 template <typename T4f>
 const T4f cloth::SwCollision<T4f>::sSkeletonWidth = simd4f(cloth::sqr(1 - 0.2f) - 1);
 
-#if NV_SIMD_SSE2
+#if PX_SSE2
 const Simd4i cloth::Gather<Simd4i>::sIntSignBit = simd4i(0x80000000);
 const Simd4i cloth::Gather<Simd4i>::sSignedMask = sIntSignBit | simd4i(0x7);
-#elif NV_SIMD_NEON
+#elif PX_NEON
 const Simd4i cloth::Gather<Simd4i>::sPack = simd4i(0x00000000, 0x04040404, 0x08080808, 0x0c0c0c0c);
 const Simd4i cloth::Gather<Simd4i>::sOffset = simd4i(0x03020100);
 const Simd4i cloth::Gather<Simd4i>::sShift = simd4i(2);

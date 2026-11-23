@@ -29,9 +29,7 @@
 
 #pragma once
 
-#ifdef _M_ARM
-#include <arm_neon.h>
-#endif
+#include <foundation/PxIntrinsics.h>
 
 namespace nv
 {
@@ -40,12 +38,7 @@ namespace cloth
 
 uint32_t findBitSet(uint32_t mask)
 {
-#ifdef _M_ARM
-	__n64 t = { mask };
-	return 31 - (vclz_u32(t)).n64_u32[0];
-#else
-	return 31 - __builtin_clz(mask);
-#endif
+	return 31 - physx::PxCountLeadingZeros(mask);
 }
 
 Simd4i intFloor(const Simd4f& v)

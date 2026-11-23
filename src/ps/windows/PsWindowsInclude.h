@@ -89,7 +89,7 @@
 #include <windows.h>
 #pragma warning(pop)
 
-#if PX_SSE2
+#if PX_INTEL_FAMILY && PX_SSE2
 #include <xmmintrin.h>
 #endif
 

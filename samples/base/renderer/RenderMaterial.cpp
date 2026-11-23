@@ -117,7 +117,7 @@ void RenderMaterial::setBlending(BlendMode blendMode)
 		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		break;
 	default:
-		NV_CLOTH_ASSERT_WITH_MESSAGE(false,"Unknown blend mode");
+		NV_CLOTH_ASSERT_WITH_MESSAGE("Unknown blend mode", false);
 	}
 
 	ID3D11Device* device = GetDeviceManager()->GetDevice();

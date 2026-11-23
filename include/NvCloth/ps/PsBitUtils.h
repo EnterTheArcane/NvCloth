@@ -30,10 +30,10 @@
 #ifndef PSFOUNDATION_PSBITUTILS_H
 #define PSFOUNDATION_PSBITUTILS_H
 
-#include "foundation/PxIntrinsics.h"
 #include "../Callbacks.h"
-#include "PsIntrinsics.h"
 #include "Ps.h"
+
+#include <foundation/PxIntrinsics.h>
 
 /** \brief NVidia namespace */
 namespace nv
@@ -78,7 +78,7 @@ Return the index of the highest set bit. Not valid for zero arg.
 PX_INLINE uint32_t lowestSetBit(uint32_t x)
 {
 	NV_CLOTH_ASSERT(x);
-	return lowestSetBitUnsafe(x);
+	return physx::PxLowestSetBitUnsafe(x);
 }
 
 /*!
@@ -88,7 +88,7 @@ Return the index of the highest set bit. Not valid for zero arg.
 PX_INLINE uint32_t highestSetBit(uint32_t x)
 {
 	NV_CLOTH_ASSERT(x);
-	return highestSetBitUnsafe(x);
+	return physx::PxHighestSetBitUnsafe(x);
 }
 
 // Helper function to approximate log2 of an integer value

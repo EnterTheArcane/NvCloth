@@ -29,11 +29,11 @@
 
 #pragma once
 
-#include <foundation/Px.h>
-
 #ifndef __CUDACC__
 #include "Simd.h"
 #endif
+
+#include <cstdint>
 
 namespace nv
 {

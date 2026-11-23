@@ -69,7 +69,7 @@ struct Simd4iTupleFactory
 	Simd4iTupleFactory& operator = (const Simd4iTupleFactory&); // not implemented
 	inline operator Simd4i() const;
 	inline operator Scalar4i() const;
-	NV_SIMD_ALIGN(16, int) tuple[4];
+	PX_ALIGN(16, int) tuple[4];
 };
 
 /*! \brief Loads Simd4i from (unaligned) pointer.
@@ -357,9 +357,9 @@ NV_SIMD_NAMESPACE_END
 // platform specific includes
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#if NV_SIMD_SSE2
+#if PX_SSE2
 #include "sse2/NvSse2Simd4i.h"
-#elif NV_SIMD_NEON
+#elif PX_NEON
 #include "neon/NvNeonSimd4i.h"
 #endif
 

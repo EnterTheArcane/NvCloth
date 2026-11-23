@@ -30,11 +30,18 @@
 #ifndef PSFOUNDATION_PSUTILITIES_H
 #define PSFOUNDATION_PSUTILITIES_H
 
-#include "foundation/PxVec3.h"
-#include "NvCloth/ps/Ps.h"
-#include "NvCloth/ps/PsIntrinsics.h"
-#include "NvCloth/ps/PsBasicTemplates.h"
 #include "NvCloth/Callbacks.h"
+#include "NvCloth/ps/PsBasicTemplates.h"
+#include "NvCloth/ps/PsIntrinsics.h"
+
+#include <foundation/PxMat33.h>
+#include <foundation/PxMath.h>
+#include <foundation/PxQuat.h>
+#include <foundation/PxSimpleTypes.h>
+#include <foundation/PxTransform.h>
+#include <foundation/PxVec3.h>
+
+#include <csignal>
 
 /** \brief NVidia namespace */
 namespace nv
@@ -85,13 +92,6 @@ PX_CUDA_CALLABLE PX_FORCE_INLINE physx::PxI8 toI8(physx::PxU32 value)
 }
 
 /*!
-Get number of elements in array
-*/
-template <typename T, size_t N>
-char (&ArraySizeHelper(T (&array)[N]))[N];
-#define PX_ARRAY_SIZE(_array) (sizeof(nv::cloth::ps::ArraySizeHelper(_array)))
-
-/*!
 Sort two elements using operator<
 
 On return x will be the smaller of the two
@@ -127,17 +127,16 @@ PX_CUDA_CALLABLE PX_FORCE_INLINE void order(T& x, T& y, E1& xe1, E1& ye1)
 	}
 }
 
-#if PX_GCC_FAMILY && !PX_EMSCRIPTEN && !PX_LINUX
-__attribute__((noreturn))
-#endif
-    PX_INLINE void debugBreak()
+PX_INLINE void debugBreak()
 {
 #if PX_WINDOWS || PX_XBOXONE
 	__debugbreak();
 #elif PX_ANDROID
 	raise(SIGTRAP); // works better than __builtin_trap. Proper call stack and can be continued.
+#elif PX_EMSCRIPTEN
+	__builtin_trap();
 #elif PX_LINUX
-	#if (PX_X64 || PX_X64)
+	#if PX_INTEL_FAMILY
 		asm("int $3");
 	#else
 		raise(SIGTRAP);

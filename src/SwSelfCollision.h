@@ -29,9 +29,11 @@
 
 #pragma once
 
-#include "StackAllocator.h"
-#include <foundation/Px.h>
 #include "Simd.h"
+#include "StackAllocator.h"
+
+#include <cstddef>
+#include <cstdint>
 
 namespace nv
 {

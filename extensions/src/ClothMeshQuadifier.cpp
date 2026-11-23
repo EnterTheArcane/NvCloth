@@ -27,14 +27,16 @@
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
-#include "foundation/PxStrideIterator.h"
 #include "NvClothExt/ClothMeshQuadifier.h"
 
-// from shared foundation
-#include "../../src/ps/PsSort.h"
-#include "NvCloth/ps/Ps.h"
-#include "NvCloth/ps/PsMathUtils.h"
 #include "NvCloth/Allocator.h"
+#include "NvCloth/ps/PsMathUtils.h"
+#include "ps/PsSort.h"
+
+#include <foundation/PxMath.h>
+#include <foundation/PxSimpleTypes.h>
+#include <foundation/PxStrideIterator.h>
+#include <foundation/PxVec3.h>
 
 using namespace physx;
 

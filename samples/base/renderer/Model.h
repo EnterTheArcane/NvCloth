@@ -21,7 +21,7 @@
 #include <string>
 #include <map>
 #include <assert.h>
-#include <PxMath.h>
+#include <foundation/PxMath.h>
 #include "renderer/Mesh.h"
 #include "utils/JobManager.h"
 

@@ -30,11 +30,15 @@
 #ifndef PSFOUNDATION_PSHASHINTERNALS_H
 #define PSFOUNDATION_PSHASHINTERNALS_H
 
-#include "PsBasicTemplates.h"
 #include "PsArray.h"
+#include "PsBasicTemplates.h"
 #include "PsBitUtils.h"
 #include "PsHash.h"
-#include "foundation/PxIntrinsics.h"
+
+#include <foundation/PxIntrinsics.h>
+#include <foundation/PxMemory.h>
+
+#include <new>
 
 #if PX_VC
 #pragma warning(push)
@@ -156,7 +160,7 @@ class HashBase : private Allocator
 		if(*ptr == EOL)
 			return false;
 
-		PX_PLACEMENT_NEW(&e, Entry)(mEntries[*ptr]);		
+		new (&e) Entry(mEntries[*ptr]);
 
 		return eraseInternal(ptr);
 	}
@@ -194,12 +198,12 @@ class HashBase : private Allocator
 
 		destroy();
 
-		physx::intrinsics::memSet(mHash, EOL, mHashSize * sizeof(uint32_t));
+		physx::PxMemSet(mHash, EOL, mHashSize * sizeof(uint32_t));
 
 		const uint32_t sizeMinus1 = mEntriesCapacity - 1;
 		for(uint32_t i = 0; i < sizeMinus1; i++)
 		{
-			prefetchLine(mEntriesNext + i, 128);
+			physx::PxPrefetchLine(mEntriesNext + i, 128);
 			mEntriesNext[i] = i + 1;
 		}
 		mEntriesNext[mEntriesCapacity - 1] = uint32_t(EOL);
@@ -307,7 +311,7 @@ class HashBase : private Allocator
 
 	PX_INLINE void replaceWithLast(uint32_t index)
 	{
-		PX_PLACEMENT_NEW(mEntries + index, Entry)(mEntries[mEntriesCount]);
+		new (mEntries + index) Entry(mEntries[mEntriesCount]);
 		mEntries[mEntriesCount].~Entry();
 		mEntriesNext[index] = mEntriesNext[mEntriesCount];
 
@@ -382,7 +386,7 @@ class HashBase : private Allocator
 		}
 
 		// initialize new hash table
-		physx::intrinsics::memSet(newHash, uint32_t(EOL), newHashSize * sizeof(uint32_t));
+		physx::PxMemSet(newHash, uint32_t(EOL), newHashSize * sizeof(uint32_t));
 
 		// iterate over old entries, re-hash and create new entries
 		if(resizeCompact)
@@ -396,14 +400,14 @@ class HashBase : private Allocator
 				newEntriesNext[index] = newHash[h];
 				newHash[h] = index;
 
-				PX_PLACEMENT_NEW(newEntries + index, Entry)(mEntries[index]);
+				new (newEntries + index) Entry(mEntries[index]);
 				mEntries[index].~Entry();
 			}
 		}
 		else
 		{
 			// copy old free list, only required for non compact resizing
-			physx::intrinsics::memCopy(newEntriesNext, mEntriesNext, mEntriesCapacity * sizeof(uint32_t));
+			physx::PxMemCopy(newEntriesNext, mEntriesNext, mEntriesCapacity * sizeof(uint32_t));
 
 			for(uint32_t bucket = 0; bucket < mHashSize; bucket++)
 			{
@@ -416,7 +420,7 @@ class HashBase : private Allocator
 
 					newHash[h] = index;
 
-					PX_PLACEMENT_NEW(newEntries + index, Entry)(mEntries[index]);
+					new (newEntries + index) Entry(mEntries[index]);
 					mEntries[index].~Entry();
 
 					index = mEntriesNext[index];
@@ -625,7 +629,7 @@ HashBase<Entry, Key, HashFn, GetKey, Allocator, compacting>::copy(const HashBase
 			Entry* newEntry = create(GK()(otherEntry), exists);
 			NV_CLOTH_ASSERT(!exists);
 
-			PX_PLACEMENT_NEW(newEntry, Entry)(otherEntry);
+			new (newEntry) Entry(otherEntry);
 		}
 	}
 }
@@ -664,7 +668,7 @@ class HashSetBase
 		bool exists;
 		Key* e = mBase.create(k, exists);
 		if(!exists)
-			PX_PLACEMENT_NEW(e, Key)(k);
+			new (e) Key(k);
 		return !exists;
 	}
 
@@ -734,7 +738,7 @@ class HashMapBase
 		bool exists;
 		Entry* e = mBase.create(k, exists);
 		if(!exists)
-			PX_PLACEMENT_NEW(e, Entry)(k, v);
+			new (e) Entry(k, v);
 		return !exists;
 	}
 
@@ -743,7 +747,7 @@ class HashMapBase
 		bool exists;
 		Entry* e = mBase.create(k, exists);
 		if(!exists)
-			PX_PLACEMENT_NEW(e, Entry)(k, Value());
+			new (e) Entry(k, Value());
 
 		return e->second;
 	}

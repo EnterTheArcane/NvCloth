@@ -51,7 +51,9 @@ JobManager SceneController::sJobManager;
 SceneController::SceneController() : mTimeScale(1.0f), mStartDelay(0.f)
 {
 	mActivePlatform = (int)nv::cloth::Platform::CPU;
+#if USE_CUDA
 	mCUDAInitialized = false;
+#endif
 	mDXInitialized = false;
 	mLeftOverTime = 0.0;
 	mPaused = false;
@@ -111,7 +113,7 @@ void SceneController::onInitialize()
 	mFactories[(int)nv::cloth::Platform::CUDA] = nullptr;
 	mFactories[(int)nv::cloth::Platform::DX11] = nullptr;
 	
-	//CUDA
+#if USE_CUDA
 	do
 	{
 		assert(mCUDAInitialized == false);
@@ -122,12 +124,17 @@ void SceneController::onInitialize()
 		mCUDAInitialized &= deviceCount >= 1;
 		if(!mCUDAInitialized)
 			break;
+#if CUDA_VERSION >= 13000
+		mCUDAInitialized = cuCtxCreate(&mCUDAContext, nullptr, 0, 0) == CUDA_SUCCESS;
+#else
 		mCUDAInitialized = cuCtxCreate(&mCUDAContext, 0, 0) == CUDA_SUCCESS;
+#endif
 		if(!mCUDAInitialized)
 			break;
 
 		mFactories[(int)nv::cloth::Platform::CUDA] = NvClothCreateFactoryCUDA(mCUDAContext);
 	} while(false);
+#endif
 
 	//DX11
 	do

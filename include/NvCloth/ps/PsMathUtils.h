@@ -30,12 +30,16 @@
 #ifndef PSFOUNDATION_PSMATHUTILS_H
 #define PSFOUNDATION_PSMATHUTILS_H
 
-#include "foundation/PxPreprocessor.h"
-#include "foundation/PxTransform.h"
-#include "foundation/PxMat33.h"
-#include "NvCloth/ps/Ps.h"
-#include "NvCloth/ps/PsIntrinsics.h"
 #include "NvCloth/Callbacks.h"
+#include "NvCloth/ps/Ps.h"
+
+#include <foundation/PxMat33.h>
+#include <foundation/PxMath.h>
+#include <foundation/PxQuat.h>
+#include <foundation/PxTransform.h>
+#include <foundation/PxVec3.h>
+
+#include <cstdlib>
 
 // General guideline is: if it's an abstract math function, it belongs here.
 // If it's a math function where the inputs have specific semantics (e.g.
@@ -54,7 +58,11 @@ namespace ps
 */
 PX_CUDA_CALLABLE PX_FORCE_INLINE physx::PxF32 sign(const physx::PxF32 a)
 {
-	return physx::intrinsics::sign(a);
+	if (a >= 0.0f)
+	{
+		return 1.0f;
+	}
+	return -1.0f;
 }
 
 /**
@@ -95,7 +103,7 @@ x.
 */
 PX_CUDA_CALLABLE PX_FORCE_INLINE physx::PxF32 floor(const physx::PxF32 a)
 {
-	return floatFloor(a);
+	return physx::PxFloor(a);
 }
 
 /**
@@ -313,7 +321,7 @@ PX_FORCE_INLINE physx::PxI32 rand(const physx::PxI32 a, const physx::PxI32 b)
 */
 PX_FORCE_INLINE physx::PxF32 rand(const physx::PxF32 a, const physx::PxF32 b)
 {
-	return a + (b - a) * ::rand() / RAND_MAX;
+	return a + (b - a) * ::rand() / static_cast<physx::PxF32>(RAND_MAX);
 }
 
 //! \brief return angle between two vectors in radians

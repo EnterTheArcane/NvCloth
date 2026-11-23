@@ -30,7 +30,7 @@
 #ifndef PSFOUNDATION_PSWINDOWSINTRINSICS_H
 #define PSFOUNDATION_PSWINDOWSINTRINSICS_H
 
-#include "Ps.h"
+#include "NvCloth/ps/Ps.h"
 
 // this file is for internal intrinsics - that is, intrinsics that are used in
 // cross platform code but do not appear in the API
@@ -54,7 +54,9 @@
 #pragma warning(pop)
 
 #include <float.h>
+#if PX_INTEL_FAMILY
 #include <mmintrin.h>
+#endif
 
 #pragma intrinsic(_BitScanForward)
 #pragma intrinsic(_BitScanReverse)
@@ -118,7 +120,7 @@ PX_FORCE_INLINE uint32_t countLeadingZeros(uint32_t v)
 /*!
 Prefetch aligned cache size around \c ptr+offset.
 */
-#if !PX_ARM
+#if PX_INTEL_FAMILY
 PX_FORCE_INLINE void prefetchLine(const void* ptr, uint32_t offset = 0)
 {
 	// cache line on X86/X64 is 64-bytes so a 128-byte prefetch would require 2 prefetches.
@@ -138,7 +140,7 @@ PX_FORCE_INLINE void prefetchLine(const void* ptr, uint32_t offset = 0)
 /*!
 Prefetch \c count bytes starting at \c ptr.
 */
-#if !PX_ARM
+#if PX_INTEL_FAMILY
 PX_FORCE_INLINE void prefetch(const void* ptr, uint32_t count = 1)
 {
 	const char* cp = (char*)ptr;

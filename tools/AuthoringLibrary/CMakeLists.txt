@@ -1,90 +1,63 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 4.3)
 
-project(NvClothAuthoringLibrary CXX)
+get_property(nvcloth_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(nvcloth_multi_config
+    AND CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR
+    AND NOT DEFINED ENV{CMAKE_CONFIGURATION_TYPES}
+)
+    set(CMAKE_CONFIGURATION_TYPES Debug Checked Profile Release CACHE STRING "Build configurations")
+endif()
 
-CMAKE_POLICY(SET CMP0057 NEW) # Enable IN_LIST
+project(NvClothAuthoringLibrary
+    LANGUAGES CXX
+)
 
-SET(GW_DEPS_ROOT $ENV{GW_DEPS_ROOT})
+if(PROJECT_IS_TOP_LEVEL AND NOT nvcloth_multi_config AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build configuration" FORCE)
+endif()
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}; $ENV{GW_DEPS_ROOT}/Externals/CMakeModules)
+if(MSVC AND STATIC_WINCRT)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
+if(NOT TARGET NvCloth::NvCloth)
+    add_subdirectory(../.. NvCloth)
+endif()
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}; "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}; "${CMAKE_CURRENT_SOURCE_DIR}/external/CMakeModules")
+add_library(NvClothAuthoringLibrary STATIC)
 
-IF(NOT DEFINED AUTHORINGLIBRARY_ROOT_DIR)
-	
-	STRING(REPLACE "\\" "/" BRD_TEMP $ENV{AUTHORINGLIBRARY_ROOT_DIR})
-	
-	# This env variable is set by GenerateProjects.bat, and is no longer available when CMake rebuilds, so this stores it in the cache
-	SET(AUTHORINGLIBRARY_ROOT_DIR ${BRD_TEMP} CACHE INTERNAL "Root of the AuthoringLibrary source tree")
+target_sources(NvClothAuthoringLibrary
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS
+            include
+        FILES
+            include/NvClothAuthoringLibrary/CollisionVisualization.h
+            include/NvClothAuthoringLibrary/DebugVisualization.h
+            include/NvClothAuthoringLibrary/Parameters.h
 
-ENDIF()
+    PRIVATE
+        src/CollisionVisualization.cpp
+        src/DebugVisualization.cpp
+        src/Parameters.cpp
+)
+target_link_libraries(NvClothAuthoringLibrary
+    PUBLIC
+        NvCloth::NvCloth
+)
 
-IF(NOT EXISTS ${AUTHORINGLIBRARY_ROOT_DIR})
-	MESSAGE(FATAL_ERROR "AUTHORINGLIBRARY_ROOT_DIR environment variable wasn't set or was invalid.")
-ENDIF()
-
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${GW_DEPS_ROOT}/CMakeModules")
-
-MESSAGE("AUTHORINGLIBRARY_ROOT_DIR:" ${AUTHORINGLIBRARY_ROOT_DIR})
-MESSAGE("GW_DEPS_ROOT:" ${GW_DEPS_ROOT})
-MESSAGE("Module path:" ${CMAKE_MODULE_PATH})
-
-
-IF(CMAKE_CONFIGURATION_TYPES)
-	SET(CMAKE_CONFIGURATION_TYPES debug profile checked release)
-	SET(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-		"Reset config to what we need" 
-		FORCE)
-	
-	SET(CMAKE_SHARED_LINKER_FLAGS_CHECKED "")
-	SET(CMAKE_SHARED_LINKER_FLAGS_PROFILE "")
-	
-	SET(CMAKE_EXE_LINKER_FLAGS_CHECKED "")
-	SET(CMAKE_EXE_LINKER_FLAGS_PROFILE "")
-	
-ENDIF()
-
-# Default to appending "DEBUG", "PROFILE", etc to produced artifacts
-IF(NOT DEFINED APPEND_CONFIG_NAME)
-	SET(APPEND_CONFIG_NAME ON)
-ENDIF()
-
-IF (APPEND_CONFIG_NAME)
-	MESSAGE("Appending config to output names")
-
-	SET(CMAKE_DEBUG_POSTFIX "DEBUG")
-	SET(CMAKE_PROFILE_POSTFIX "PROFILE")
-	SET(CMAKE_CHECKED_POSTFIX "CHECKED")
-	SET(CMAKE_RELEASE_POSTFIX "")
-ENDIF()
-
-INCLUDE(SetOutputPaths)
-
-# Either have to define a single output path, or each one.
-
-IF(NOT DEFINED BL_OUTPUT_DIR)
-	IF (NOT DEFINED BL_LIB_OUTPUT_DIR)
-		MESSAGE(FATAL_ERROR "BL_LIB_OUTPUT_DIR not defined - Define either BL_OUTPUT_DIR or BL_LIB_OUTPUT_DIR and BL_DLL_OUTPUT_DIR and BL_EXE_OUTPUT_DIR")
-	ENDIF()
-
-	IF (NOT DEFINED BL_DLL_OUTPUT_DIR)
-		MESSAGE(FATAL_ERROR "BL_DLL_OUTPUT_DIR not defined - Define either BL_OUTPUT_DIR or BL_LIB_OUTPUT_DIR and BL_DLL_OUTPUT_DIR and BL_EXE_OUTPUT_DIR")
-	ENDIF()
-
-	IF (NOT DEFINED BL_EXE_OUTPUT_DIR)
-		MESSAGE(FATAL_ERROR "BL_EXE_OUTPUT_DIR not defined - Define either BL_OUTPUT_DIR or BL_LIB_OUTPUT_DIR and BL_DLL_OUTPUT_DIR and BL_EXE_OUTPUT_DIR")
-	ENDIF()
-	
-	SetLibOutputPath(${BL_LIB_OUTPUT_DIR})
-	SetDllOutputPath(${BL_DLL_OUTPUT_DIR})
-	SetExeOutputPath(${BL_EXE_OUTPUT_DIR})
-ELSE()
-	SetSingleOutputPath(${BL_OUTPUT_DIR})
-ENDIF()
-
-SET(PROJECT_CMAKE_FILES_DIR compiler/cmake/)
-
-# Include the platform specific configuration
-INCLUDE(${PROJECT_CMAKE_FILES_DIR}${TARGET_BUILD_PLATFORM}/CMakeLists.txt OPTIONAL)
+if(MSVC)
+    target_compile_definitions(NvClothAuthoringLibrary
+        PRIVATE
+            _CRT_SECURE_NO_DEPRECATE
+    )
+    target_compile_options(NvClothAuthoringLibrary
+        PRIVATE
+            /GR-
+            /MP
+            /fp:fast
+            /W3 /WX
+            /wd4005 /wd4244
+            "$<$<CONFIG:Checked,Profile>:/O2;/Z7>"
+    )
+endif()

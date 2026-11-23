@@ -1,0 +1,19 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(PhysX @PhysX_VERSION@ EXACT CONFIG)
+
+get_target_property(_nvcloth_foundation_type PhysX::PhysXFoundation TYPE)
+if(NOT _nvcloth_foundation_type STREQUAL "@physx_foundation_type@")
+    set(NvCloth_FOUND FALSE)
+    set(NvCloth_NOT_FOUND_MESSAGE "NvCloth requires the PhysXFoundation linkage it was built against (@physx_foundation_type@)")
+    return()
+endif()
+unset(_nvcloth_foundation_type)
+
+if(@NVCLOTH_EXPORT_CUDA_DEPENDENCY@)
+    find_dependency(CUDAToolkit)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/NvClothTargets.cmake")
+check_required_components(NvCloth)

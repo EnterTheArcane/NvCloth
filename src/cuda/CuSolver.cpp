@@ -36,8 +36,10 @@
 #include "CuContextLock.h"
 #include "CuCheckSuccess.h"
 #include "../IterationState.h"
-#include "../Ps/PsSort.h"
+#include "../ps/PsSort.h"
+
 #include <foundation/PxProfiler.h>
+#include <foundation/PxUtilities.h>
 
 #if NV_NVTX
 #include "nvToolsExt.h"
@@ -47,6 +49,7 @@
 
 #if NV_CUPTI
 #pragma warning(disable : 4324)
+#include "NvCloth/ps/PsAlignedMalloc.h"
 #include "cupti_activity.h"
 #include "cupti_metrics.h"
 #include "cupti_driver_cbid.h"
@@ -56,7 +59,8 @@ namespace
 {
 void CUPTIAPI bufferRequested(uint8_t** buffer, size_t* size, size_t* maxNumRecords)
 {
-	*buffer = (uint8_t*)PX_ALIGNED16_ALLOC(*size = 32 * 1024 * 1024);
+	*size = 32 * 1024 * 1024;
+	*buffer = static_cast<uint8_t*>(nv::cloth::ps::AlignedAllocator<16>().allocate(*size, __FILE__, __LINE__));
 	*maxNumRecords = 0;
 }
 
@@ -89,7 +93,7 @@ void CUPTIAPI bufferCompleted(CUcontext context, uint32_t streamId, uint8_t* buf
 		printf("Dropped %u activity records\n", unsigned(dropped));
 	}
 
-	PX_ALIGNED16_FREE(buffer);
+	nv::cloth::ps::AlignedAllocator<16>().deallocate(buffer);
 }
 
 struct CuptiEventProfiler

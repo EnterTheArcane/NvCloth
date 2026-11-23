@@ -303,7 +303,7 @@ bool ClothMeshData::InitializeFromData(nv::cloth::BoundedData positions, nv::clo
 	if(positions.count < 3 || indices.count < 3)
 		return false;
 
-	NV_CLOTH_ASSERT(sizeof(PositionType) != physx::PxVec3 || positions.count % 3 == 0);
+	NV_CLOTH_ASSERT(sizeof(PositionType) == sizeof(physx::PxVec3) || positions.count % 3 == 0);
 	NV_CLOTH_ASSERT(indices.count % 3 == 0);
 
 	auto numVertices = (sizeof(PositionType) == sizeof(physx::PxVec3)) ? positions.count : positions.count / 3;

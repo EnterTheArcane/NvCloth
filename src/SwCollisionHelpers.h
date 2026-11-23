@@ -55,11 +55,11 @@ struct Gather<Simd4i>
 	inline Gather(const Simd4i& index);
 	inline Simd4i operator()(const Simd4i*) const;
 
-#if NV_SIMD_SSE2
+#if PX_SSE2
 	Simd4i mSelectQ, mSelectD, mSelectW;
 	static const Simd4i sIntSignBit;
 	static const Simd4i sSignedMask;
-#elif NV_SIMD_NEON
+#elif PX_NEON
 	Simd4i mPermute;
 	static const Simd4i sPack;
 	static const Simd4i sOffset;
@@ -73,9 +73,9 @@ struct Gather<Simd4i>
 } // namespace cloth
 } // namespace nv
 
-#if NV_SIMD_SSE2
+#if PX_SSE2
 #include "sse2/SwCollisionHelpers.h"
-#elif NV_SIMD_NEON
+#elif PX_NEON
 #include "neon/SwCollisionHelpers.h"
 #endif
 

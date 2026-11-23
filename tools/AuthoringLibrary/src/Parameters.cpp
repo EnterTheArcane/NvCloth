@@ -35,25 +35,22 @@ namespace cloth
 namespace authoring
 {
 
-Parameter InitParameter(ParameterType type, int catagoryId, const char* name, const char* description, void* set, void* get)
+static void InitParameter(Parameter& p, ParameterType type, int catagoryId, const char* name, const char* description)
 {
-	Parameter p;
 	static int nextId = 0;
 	p.mCatagoryId = catagoryId;
 	p.mParameterId = nextId++;
 	p.mName = name;
 	p.mDescription = description;
 	p.mType = type;
-	p.SetFunctionPointer = set;
-	p.GetFunctionPointer = get;
-	p.mHardMinLimit = false;
-	p.mHardMaxLimit = false;
-	return p;
 }
 
 Parameter InitParameter(int catagoryId, const char* name, const char* description, SetFloatParamType set, GetFloatParamType get, float minV, float maxV, bool hardMin = false, bool hardMax = false)
 {
-	Parameter p = InitParameter(ParameterType::FLOAT, catagoryId, name, description, set, get);
+	Parameter p;
+	InitParameter(p, ParameterType::FLOAT, catagoryId, name, description);
+	p.SetFloat = set;
+	p.GetFloat = get;
 	p.mMinFloat = minV;
 	p.mMaxFloat = maxV;
 	p.mHardMinLimit = hardMin;
@@ -63,7 +60,10 @@ Parameter InitParameter(int catagoryId, const char* name, const char* descriptio
 
 Parameter InitParameter(int catagoryId, const char* name, const char* description, SetVec3ParamType set, GetVec3ParamType get, physx::PxVec3 minV, physx::PxVec3 maxV, ParameterType parameterType = ParameterType::VEC3, bool hardMin = false, bool hardMax = false)
 {
-	Parameter p = InitParameter(parameterType, catagoryId, name, description, set, get);
+	Parameter p;
+	InitParameter(p, parameterType, catagoryId, name, description);
+	p.SetVec3 = set;
+	p.GetVec3 = get;
 	p.mMinVec3 = minV;
 	p.mMaxVec3 = maxV;
 	p.mHardMaxLimit = hardMax;

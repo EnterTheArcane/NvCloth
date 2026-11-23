@@ -30,8 +30,9 @@
 #ifdef __cplusplus
 #pragma once
 
-#include <foundation/Px.h>
 #include "Simd.h"
+
+#include <cstdint>
 
 namespace nv
 {

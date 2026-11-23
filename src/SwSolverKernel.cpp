@@ -38,7 +38,7 @@
 
 using namespace physx;
 
-#define NV_AVX (NV_SIMD_SIMD&&(PX_WIN32 || PX_WIN64) && PX_VC >= 10)
+#define NV_AVX (PX_SSE2 && PX_WINDOWS_FAMILY && PX_VC >= 10)
 #ifdef _MSC_VER 
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
@@ -373,7 +373,7 @@ void solveConstraints(float* __restrict posIt, const float* __restrict rIt, cons
 	}
 }
 
-#if PX_WINDOWS_FAMILY && NV_SIMD_SSE2
+#if PX_WINDOWS_FAMILY && PX_SSE2
 #include "sse2/SwSolveConstraints.h"
 #endif
 

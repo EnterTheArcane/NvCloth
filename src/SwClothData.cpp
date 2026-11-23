@@ -30,8 +30,9 @@
 #include "SwClothData.h"
 #include "SwCloth.h"
 #include "SwFabric.h"
-#include <foundation/Px.h>
 #include "ps/PsUtilities.h"
+
+#include <cmath>
 
 using namespace physx;
 using namespace nv;
@@ -74,19 +75,19 @@ cloth::SwClothData::SwClothData(SwCloth& cloth, const SwFabric& fabric)
 	mTethers = fabric.mTethers.begin();
 	mNumTethers = uint32_t(fabric.mTethers.size());
 	//1-(1 - stiffness)^stiffnessExponent
-	mTetherConstraintStiffness = 1.0f - expf(stiffnessExponent * cloth.mTetherConstraintLogStiffness);
+	mTetherConstraintStiffness = 1.0f - std::exp(stiffnessExponent * cloth.mTetherConstraintLogStiffness);
 	mTetherConstraintScale = cloth.mTetherConstraintScale * fabric.mTetherLengthScale;
 
 	mTriangles = fabric.mTriangles.begin();
 	mNumTriangles = uint32_t(fabric.mTriangles.size()) / 3;
-	mDragCoefficient = 1.0f - expf(stiffnessExponent * cloth.mDragLogCoefficient);
-	mLiftCoefficient = 1.0f - expf(stiffnessExponent * cloth.mLiftLogCoefficient);
+	mDragCoefficient = 1.0f - std::exp(stiffnessExponent * cloth.mDragLogCoefficient);
+	mLiftCoefficient = 1.0f - std::exp(stiffnessExponent * cloth.mLiftLogCoefficient);
 	mFluidDensity = cloth.mFluidDensity * 0.5f; //divide by 2 to so we don't have to compensate for double area from cross product in the solver
 
 	mStartMotionConstraints = cloth.mMotionConstraints.mStart.size() ? array(cloth.mMotionConstraints.mStart.front()) : 0;
 	mTargetMotionConstraints =
 	    !cloth.mMotionConstraints.mTarget.empty() ? array(cloth.mMotionConstraints.mTarget.front()) : 0;
-	mMotionConstraintStiffness = 1.0f - expf(stiffnessExponent * cloth.mMotionConstraintLogStiffness);
+	mMotionConstraintStiffness = 1.0f - std::exp(stiffnessExponent * cloth.mMotionConstraintLogStiffness);
 
 	mStartSeparationConstraints =
 	    cloth.mSeparationConstraints.mStart.size() ? array(cloth.mSeparationConstraints.mStart.front()) : 0;
@@ -126,7 +127,7 @@ cloth::SwClothData::SwClothData(SwCloth& cloth, const SwFabric& fabric)
 	mFrictionScale = cloth.mFriction;
 
 	mSelfCollisionDistance = cloth.mSelfCollisionDistance;
-	mSelfCollisionStiffness = 1.0f - expf(stiffnessExponent * cloth.mSelfCollisionLogStiffness);
+	mSelfCollisionStiffness = 1.0f - std::exp(stiffnessExponent * cloth.mSelfCollisionLogStiffness);
 
 	mSelfCollisionIndices = cloth.mSelfCollisionIndices.empty() ? nullptr : cloth.mSelfCollisionIndices.begin();
 	mNumSelfCollisionIndices = mSelfCollisionIndices ? uint32_t(cloth.mSelfCollisionIndices.size()) : mNumParticles;

@@ -35,7 +35,6 @@
 */
 
 #include "PsSortInternals.h"
-#include "PsAlloca.h"
 
 #define PX_SORT_PARANOIA PX_DEBUG
 
@@ -62,12 +61,12 @@ namespace ps
 {
 
 template <class T, class Predicate, class Allocator>
-void sort(T* elements, uint32_t count, const Predicate& compare, const Allocator& inAllocator,
-          const uint32_t initialStackSize = 32)
+void sort(T* elements, uint32_t count, const Predicate& compare, const Allocator& inAllocator)
 {
 	static const uint32_t SMALL_SORT_CUTOFF = 5; // must be >= 3 since we need 3 for median
 
-	PX_ALLOCA(stackMem, int32_t, initialStackSize);
+	constexpr uint32_t initialStackSize = 32;
+	int32_t stackMem[initialStackSize];
 	internal::Stack<Allocator> stack(stackMem, initialStackSize, inAllocator);
 
 	int32_t first = 0, last = int32_t(count - 1);

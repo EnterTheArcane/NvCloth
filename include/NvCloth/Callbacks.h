@@ -34,11 +34,21 @@
   */
 
 #pragma once
+
+#include <foundation/PxAllocatorCallback.h>
+#include <foundation/PxAssert.h>
+#include <foundation/PxErrorCallback.h>
 #include <foundation/PxPreprocessor.h>
 #include <foundation/PxProfiler.h>
-#include <foundation/PxAllocatorCallback.h>
+
 #ifndef NV_CLOTH_IMPORT
+#if defined(NV_CLOTH_STATIC)
+#define NV_CLOTH_IMPORT
+#elif defined(NV_CLOTH_EXPORTS)
+#define NV_CLOTH_IMPORT PX_DLL_EXPORT
+#else
 #define NV_CLOTH_IMPORT PX_DLL_IMPORT
+#endif
 #endif
 
 #define NV_CLOTH_DLL_ID 0x2
@@ -95,10 +105,10 @@ public:
 
 
 //Logging
-void LogErrorFn  (const char* fileName, int lineNumber, const char* msg, ...);
-void LogInvalidParameterFn  (const char* fileName, int lineNumber, const char* msg, ...);
-void LogWarningFn(const char* fileName, int lineNumber, const char* msg, ...);
-void LogInfoFn   (const char* fileName, int lineNumber, const char* msg, ...);
+NV_CLOTH_IMPORT void LogErrorFn(const char* fileName, int lineNumber, const char* msg, ...);
+NV_CLOTH_IMPORT void LogInvalidParameterFn(const char* fileName, int lineNumber, const char* msg, ...);
+NV_CLOTH_IMPORT void LogWarningFn(const char* fileName, int lineNumber, const char* msg, ...);
+NV_CLOTH_IMPORT void LogInfoFn(const char* fileName, int lineNumber, const char* msg, ...);
 ///arguments: NV_CLOTH_LOG_ERROR("format %s %s\n","additional","arguments");
 #define NV_CLOTH_LOG_ERROR(...) nv::cloth::LogErrorFn(__FILE__,__LINE__,__VA_ARGS__)
 #define NV_CLOTH_LOG_INVALID_PARAMETER(...) nv::cloth::LogInvalidParameterFn(__FILE__,__LINE__,__VA_ARGS__)
@@ -116,13 +126,6 @@ NV_CLOTH_API(nv::cloth::PxAssertHandler*) GetNvClothAssertHandler(); //This func
 #define NV_CLOTH_ASSERT_WITH_MESSAGE(message, exp) ((void)0)
 #endif
 #else
-#if PX_VC
-#define PX_CODE_ANALYSIS_ASSUME(exp)                                                                                   \
-	__analysis_assume(!!(exp)) // This macro will be used to get rid of analysis warning messages if a NV_CLOTH_ASSERT is used
-																 // to "guard" illegal mem access, for example.
-#else
-#define PX_CODE_ANALYSIS_ASSUME(exp)
-#endif
 #define NV_CLOTH_ASSERT(exp)                                                                                           \
 	{                                                                                                                  \
 		static bool _ignore = false;                                                                                   \
@@ -138,7 +141,7 @@ NV_CLOTH_API(nv::cloth::PxAssertHandler*) GetNvClothAssertHandler(); //This func
 #endif
 
 //Profiler
-physx::PxProfilerCallback* GetNvClothProfiler(); //Only use internally
+NV_CLOTH_IMPORT physx::PxProfilerCallback* GetNvClothProfiler(); //Only use internally
 #if PX_DEBUG || PX_CHECKED || PX_PROFILE || 1
 class NvClothProfileScoped
 {
