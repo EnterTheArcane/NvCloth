@@ -20,7 +20,7 @@ if(PROJECT_IS_TOP_LEVEL AND NOT nvcloth_multi_config AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(BUILD_SHARED_LIBS "Build NvCloth as a shared library" OFF)
-option(NV_CLOTH_ENABLE_CUDA "Build the CUDA backend on supported platforms" ON)
+option(NV_CLOTH_ENABLE_CUDA "Build the CUDA backend on supported platforms" OFF)
 option(NV_CLOTH_ENABLE_DX11 "Build the Direct3D 11 backend on Windows" OFF)
 
 find_package(PhysX 5...<6 CONFIG REQUIRED)
@@ -243,19 +243,21 @@ if(NV_CLOTH_ENABLE_CUDA)
         message(FATAL_ERROR "NvCloth's CUDA backend requires Windows or native Linux")
     endif()
 
-    enable_language(CUDA)
-    find_package(CUDAToolkit REQUIRED)
     set(NVCLOTH_CUDA_ARCHITECTURE "75" CACHE STRING "CUDA virtual architecture for the NvCloth kernel")
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES AND "$ENV{CUDAARCHS}" STREQUAL "")
+        set(CMAKE_CUDA_ARCHITECTURES "${NVCLOTH_CUDA_ARCHITECTURE}-virtual")
+    endif()
 
-    # The factory loads a device-only image through the CUDA Driver API.
+    enable_language(CUDA)
+    find_package(CUDAToolkit 11 REQUIRED)
+
     add_library(NvClothCudaKernel OBJECT src/cuda/CuSolverKernel.cu)
     set_target_properties(NvClothCudaKernel
         PROPERTIES
-            CUDA_FATBIN_COMPILATION ON
-            CUDA_ARCHITECTURES "${NVCLOTH_CUDA_ARCHITECTURE}-virtual"
-            CUDA_RUNTIME_LIBRARY None
             CUDA_STANDARD 14
             CUDA_STANDARD_REQUIRED ON
+            CUDA_VISIBILITY_PRESET hidden
+            POSITION_INDEPENDENT_CODE ON
     )
     target_include_directories(NvClothCudaKernel
         PRIVATE
@@ -271,23 +273,16 @@ if(NV_CLOTH_ENABLE_CUDA)
         PRIVATE
             --use_fast_math
     )
+    if(MSVC AND STATIC_WINCRT)
+        set_property(
+            TARGET NvClothCudaKernel
+            PROPERTY MSVC_RUNTIME_LIBRARY "$<TARGET_PROPERTY:NvCloth,MSVC_RUNTIME_LIBRARY>"
+        )
+    endif()
 
-    set(cuda_header_dir "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>")
-    set(cuda_header "${cuda_header_dir}/NvClothCudaKernel.h")
-    set(cuda_template "${CMAKE_CURRENT_SOURCE_DIR}/cmake/NvClothCudaKernel.h.in")
-    add_custom_command(
-        OUTPUT "${cuda_header}"
-        COMMAND "${CMAKE_COMMAND}" -E bin2c --template-file "${cuda_template}"
-            "$<TARGET_OBJECTS:NvClothCudaKernel>" "${cuda_header}"
-        DEPENDS
-            NvClothCudaKernel
-            "$<TARGET_OBJECTS:NvClothCudaKernel>"
-            "${cuda_template}"
-        VERBATIM
-    )
     target_sources(NvCloth
         PRIVATE
-            "${cuda_header}"
+            "$<TARGET_OBJECTS:NvClothCudaKernel>"
             src/cuda/CuCloth.cpp
             src/cuda/CuClothClone.cpp
             src/cuda/CuClothData.cpp
@@ -296,13 +291,15 @@ if(NV_CLOTH_ENABLE_CUDA)
             src/cuda/CuFactory.cpp
             src/cuda/CuSolver.cpp
     )
-    target_include_directories(NvCloth
-        PRIVATE
-            "${cuda_header_dir}"
+    set_target_properties(NvCloth
+        PROPERTIES
+            CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}"
+            CUDA_RUNTIME_LIBRARY None
     )
     target_link_libraries(NvCloth
         PRIVATE
             CUDA::cuda_driver
+            CUDA::cudart_static
     )
 
     if(WIN32 AND BUILD_SHARED_LIBS)

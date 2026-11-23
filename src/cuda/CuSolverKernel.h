@@ -29,6 +29,9 @@
 
 #pragma once
 
+#include <cuda.h>
+#include <cuda_runtime_api.h>
+
 #include <cstdint>
 
 namespace nv
@@ -87,7 +90,7 @@ struct CuKernelData
 	uint32_t mProfileBaseId;
 };
 
-const char* getKernelDataName();
+cudaError_t getKernelFunction(CUfunction& function);
 const char* getKernelFunctionName();
 }
 }

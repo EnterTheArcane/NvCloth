@@ -99,8 +99,6 @@ class CuFactory : public Factory
 
 	CUcontext mContext;
 
-	CUmodule mKernelModule;
-
 	uint32_t mNumThreadsPerBlock;
 
 	const uint32_t mMaxThreadsPerBlock;

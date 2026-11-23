@@ -63,10 +63,6 @@
 #define assert(x)
 #endif
 
-extern "C" {
-extern _CRTIMP __host__ __device__ int __cdecl printf(const char*, ...);
-}
-
 using namespace nv;
 
 // shared memory copy (instead of relying on constant cache)
@@ -1451,7 +1447,10 @@ __launch_bounds__(512, 1)
 		gClothData.mParticlesHostCopy[i] = gClothData.mParticles[i];
 }
 
-const char* cloth::getKernelFunctionName()
+cudaError_t cloth::getKernelFunction(CUfunction& function)
 {
-	return "simulateCloths";
+	cudaFunction_t runtimeFunction = nullptr;
+	const cudaError_t result = cudaGetFuncBySymbol(&runtimeFunction, reinterpret_cast<const void*>(&simulateCloths));
+	function = reinterpret_cast<CUfunction>(runtimeFunction);
+	return result;
 }

@@ -12,7 +12,12 @@ endif()
 unset(_nvcloth_foundation_type)
 
 if(@NVCLOTH_EXPORT_CUDA_DEPENDENCY@)
-    find_dependency(CUDAToolkit)
+    find_dependency(CUDAToolkit @CUDAToolkit_VERSION_MAJOR@)
+    if(NOT CUDAToolkit_VERSION_MAJOR STREQUAL "@CUDAToolkit_VERSION_MAJOR@")
+        set(NvCloth_FOUND FALSE)
+        set(NvCloth_NOT_FOUND_MESSAGE "This static NvCloth SDK requires CUDA Toolkit major @CUDAToolkit_VERSION_MAJOR@. Found CUDA Toolkit ${CUDAToolkit_VERSION}.")
+        return()
+    endif()
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/NvClothTargets.cmake")

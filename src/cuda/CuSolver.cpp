@@ -253,14 +253,16 @@ cloth::CuSolver::CuSolver(CuFactory& factory)
 
 	NV_CLOTH_ASSERT(CuProfileZoneIds::NUMZONES == PX_ARRAY_SIZE(gCuProfileZoneNames));
 
-	if (mCudaError)
+	const cudaError_t kernelError = getKernelFunction(mKernelFunction);
+	if (kernelError != cudaSuccess)
 	{
+		NV_CLOTH_LOG_ERROR("CUDA solver kernel lookup failed: %s", cudaGetErrorName(kernelError));
+		mCudaError = true;
 		CuContextLock::release();
 		return;
 	}
 
 	checkSuccess(cuStreamCreate(&mStream, 0));
-	checkSuccess(cuModuleGetFunction(&mKernelFunction, mFactory.mKernelModule, getKernelFunctionName()));
 
 	// get amount of statically allocated shared memory
 	checkSuccess(cuFuncGetAttribute(&mKernelSharedMemorySize, CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES, mKernelFunction));
@@ -397,7 +399,7 @@ cloth::Cloth * const * cloth::CuSolver::getClothList() const
 
 bool cloth::CuSolver::beginSimulation(float dt)
 {
-	if (mCloths.empty())
+	if (mCudaError || mCloths.empty())
 		return false;
 	mFrameDt = dt;
 	beginFrame();

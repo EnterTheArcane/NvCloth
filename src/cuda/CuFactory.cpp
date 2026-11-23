@@ -34,7 +34,6 @@
 #include "../ClothImpl.h"
 #include "CuCheckSuccess.h"
 #include "CuContextLock.h"
-#include "NvClothCudaKernel.h"
 
 #include <cuda.h>
 
@@ -137,7 +136,6 @@ cloth::CuFactory::CuFactory(CUcontext context)
 , mMaxThreadsPerBlock(mNumThreadsPerBlock)
 , mSolverCount(0)
 {
-	checkSuccess(cuModuleLoadFatBinary(&mKernelModule, kCuSolverKernel));
 }
 
 cloth::CuFactory::~CuFactory()
