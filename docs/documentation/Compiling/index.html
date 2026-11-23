@@ -221,93 +221,34 @@
             
   <div class="section" id="compiling">
 <h1>Compiling<a class="headerlink" href="#compiling" title="Permalink to this headline">¶</a></h1>
-<p>Cmake is automatically obtained using nvidia&#8217;s packman scripts for all platforms (except for Android).
-Internet connection is required for this.</p>
+<p>Use CMake 4.3 or newer and a PhysX 5 SDK that exports <code>PhysX::PhysXFoundation</code>. Run these commands from the repository root with your PhysX install prefix.</p>
+<pre>cmake -S . -B build -DCMAKE_PREFIX_PATH=/path/to/physx -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+cmake --install build --config Release --prefix install</pre>
+<p>The default build produces a static CPU library. Set <code>BUILD_SHARED_LIBS=ON</code> with a shared PhysX SDK for a shared build.</p>
+<p>Use <code>find_package(NvCloth CONFIG REQUIRED)</code> and link <code>NvCloth::NvCloth</code> in consumers. The installed package requires the PhysX version and foundation linkage used to build it.</p>
+<p>Enable CUDA on Windows or Linux with <code>NV_CLOTH_ENABLE_CUDA=ON</code> and CUDA Toolkit 11 or newer. Consumers of a static CUDA-enabled SDK need the same CUDA Toolkit major version. Enable Direct3D 11 on Windows with <code>NV_CLOTH_ENABLE_DX11=ON</code>.</p>
+<p>Configure <code>samples</code> for the Windows sample viewer and build the <code>base</code> target. Configure <code>tools/AuthoringLibrary</code> for the authoring library.</p>
+<p>For Emscripten, use the same SDK and WebAssembly target as PhysX.</p>
 <div class="section" id="windows">
 <h2>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h2>
-<p>For windows: Download and install the following dependencies:</p>
-<ul class="simple">
-<li>Visual studio 12 or later (2013 or later)</li>
-<li>Windows 8.1 sdk <a class="reference external" href="https://developer.microsoft.com/en-us/windows/downloads/windows-8-1-sdk">https://developer.microsoft.com/en-us/windows/downloads/windows-8-1-sdk</a></li>
-<li>CUDA sdk <a class="reference external" href="https://developer.nvidia.com/cuda-downloads">https://developer.nvidia.com/cuda-downloads</a> (version 8 or later)</li>
-</ul>
-<p>Edit <tt class="code docutils literal"><span class="pre">scripts/locate_cuda.bat</span></tt> to point to the CUDA installation folder (that contains the bin, include and lib folder), edit <tt class="code docutils literal"><span class="pre">scripts/locate_win8sdk.bat</span></tt> to point to the windows SDK (<tt class="code docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files</span> <span class="pre">(x86)\Windows</span> <span class="pre">Kits\8.1</span></tt> by default)</p>
-<p>Run <tt class="code docutils literal"><span class="pre">CmakeGenerateAll.bat</span></tt> to generate the visual studio solution files in <tt class="code docutils literal"><span class="pre">compiler/vcXXwinXX-cmake/</span></tt>.
-For example Visual Studio 2015 solution with 64-bit target processor will be placed to <tt class="code docutils literal"><span class="pre">compiler/vc14win64-cmake/</span></tt> folder.
-Then open <tt class="code docutils literal"><span class="pre">NvCloth.sln</span></tt>, choose the release/debug configuration and build the solution. The library binaries will be put to the <tt class="code docutils literal"><span class="pre">bin</span></tt> folder next to the <tt class="code docutils literal"><span class="pre">compiler</span></tt> folder.</p>
-<p>The above project generation script has optional command line arguments to control whether CUDA/DX11 solvers should be enabled:</p>
-<div class="highlight-python"><pre>CmakeGenerateProjects.bat &lt;0|1:use_cuda (default is 1)&gt; &lt;0|1:use_dx11 (default is 1)&gt;</pre>
-</div>
-<p>E.g.:</p>
-<div class="highlight-python"><pre>CmakeGenerateProjects.bat 1 0</pre>
-</div>
-<p>will include CUDA solver into the compilation but exclude the DX11 solver.</p>
-<p>Run <tt class="code docutils literal"><span class="pre">samples/CmakeGenerateProjects.bat</span></tt> to generate the visual studio solution files for the samples in <tt class="code docutils literal"><span class="pre">samples/compiler/vc14winXX-cmake/CmakeGenerateProjects.bat</span></tt>.
-You need to build assimp first before building the samples. Run <tt class="code docutils literal"><span class="pre">E:\nx0\sw\devrel\libdev\NvCloth\trunk\samples\external\assimp-4.1.0</span></tt> and build <tt class="code docutils literal"><span class="pre">samples\external\assimp-4.1.0\compiler\vc14winXX-cmake\Assimp.sln</span></tt></p>
+<p>Use Visual Studio 2022 with the v143 toolset for x64 or ARM64.</p>
 </div>
 <div class="section" id="linux">
 <h2>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h2>
-<p>Run <tt class="code docutils literal"><span class="pre">GenerateProjectsLinux.sh</span></tt> to generate make files in <tt class="code docutils literal"><span class="pre">compiler/linux64-XXXXX-cmake/</span></tt></p>
-<p>Enable or disable CUDA support by simply changing the following line in the <tt class="code docutils literal"><span class="pre">BuildProjectsLinux.sh</span></tt> script included to the distribution:</p>
-<div class="highlight-python"><pre>export USE_CUDA=0 # 0 for disable 1 for enable</pre>
-</div>
-<p>Run <tt class="code docutils literal"><span class="pre">BuildProjectsLinux.sh</span></tt> script. It will generate various makefile-based projects in the <tt class="code docutils literal"><span class="pre">compiler</span></tt> folder.
-Choose the one you need, e.g.:</p>
-<div class="highlight-python"><pre>cd compiler/linux64-release-cmake</pre>
-</div>
-<p>then run the build process (using 5 compilation processes in parallel):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">make</span> <span class="o">--</span><span class="n">jobs</span><span class="o">=</span><span class="mi">5</span>
-</pre></div>
-</div>
-<p>The library binaries will be put to the <tt class="code docutils literal"><span class="pre">bin</span></tt> folder next to the <tt class="code docutils literal"><span class="pre">compiler</span></tt> folder.</p>
-<p><strong>Note:</strong> In case you run the Linux project generation scripts <tt class="code docutils literal"><span class="pre">GenerateProjectsLinux.sh</span></tt> and see an error like this:</p>
-<div class="highlight-python"><pre>env: bash\r: No such file or directory</pre>
-</div>
-<p>this command will help to fix the line endings:</p>
-<div class="highlight-python"><pre>sed $'s/\r$//' GenerateProjectsLinux.sh &gt; GenerateProjectsLinux.sh.fixed &amp;&amp; mv GenerateProjectsLinux.sh.fixed GenerateProjectsLinux.sh &amp;&amp; chmod +x GenerateProjectsLinux.sh</pre>
-</div>
-<p>or use your favorite text editor.</p>
+<p>Use Clang with the toolchain settings used to build PhysX.</p>
 </div>
 <div class="section" id="mac">
-<h2>Mac<a class="headerlink" href="#mac" title="Permalink to this headline">¶</a></h2>
-<p>Running <tt class="code docutils literal"><span class="pre">GenerateProjectsOsx.sh</span></tt> will generate xcode-based projects (32-bit and 64-bit) in the <tt class="code docutils literal"><span class="pre">compiler</span></tt> folder.
-Choose the one you need, e.g. <tt class="code docutils literal"><span class="pre">cd</span> <span class="pre">compiler/osx64-cmake</span></tt>, open the project in XCode and build inside the IDE.
-Alternatively you can use <cite>BuildProjectsOsx.sh</cite> to build everything from the command line.</p>
-<p>The library binaries will be put to the <tt class="code docutils literal"><span class="pre">bin</span></tt> folder next to the <tt class="code docutils literal"><span class="pre">compiler</span></tt> folder.</p>
-<p><strong>Note:</strong> In case if you run the Mac project generation scripts GenerateProjectsOsx.sh and see an error like this:</p>
-<div class="highlight-python"><pre>env: bash\r: No such file or directory</pre>
-</div>
-<p>this command will help to fix the line endings:</p>
-<div class="highlight-python"><pre>sed $'s/\r$//' GenerateProjectsOsx.sh &gt; GenerateProjectsOsx.sh.fixed &amp;&amp; mv GenerateProjectsOsx.sh.fixed GenerateProjectsOsx.sh &amp;&amp; chmod +x GenerateProjectsOsx.sh</pre>
-</div>
+<h2>macOS<a class="headerlink" href="#mac" title="Permalink to this headline">¶</a></h2>
+<p>Use the Xcode toolchain and separate build trees for the arm64 and x86_64 SDKs.</p>
 </div>
 <div class="section" id="ios">
 <h2>iOS<a class="headerlink" href="#ios" title="Permalink to this headline">¶</a></h2>
-<p>Running <tt class="code docutils literal"><span class="pre">GenerateProjectsIOS.sh</span></tt> will generate xcode-based project in the <tt class="code docutils literal"><span class="pre">compiler/ios-cmake</span></tt> folder.
-After the generation is done, just open the project in XCode and build inside the IDE.</p>
-<p>The target iOS deployment version is 8.0 by default (can be changed inside the project generator script).</p>
-<p>Alternatively you can use <cite>BuildProjectsIOS.sh</cite> to build everything from the command line.</p>
+<p>Set <code>CMAKE_SYSTEM_NAME=iOS</code> and select <code>iphoneos</code> or <code>iphonesimulator</code> in <code>CMAKE_OSX_SYSROOT</code>. Use a separate build tree and the matching PhysX SDK for each.</p>
 </div>
 <div class="section" id="android">
 <h2>Android<a class="headerlink" href="#android" title="Permalink to this headline">¶</a></h2>
-<p>Download and install CMake 3.7 from <a class="reference external" href="https://cmake.org/download/">https://cmake.org/download/</a>. Edit <tt class="code docutils literal"><span class="pre">scripts/locate_cmake.bat</span></tt> to point to the cmake executable.</p>
-<p>Download NDK from <a class="reference external" href="https://developer.android.com/ndk/downloads/index.html">https://developer.android.com/ndk/downloads/index.html</a> (tested versions are r15c, r13b, r12b). Set <tt class="code docutils literal"><span class="pre">ANDROID_NDK_ROOT</span></tt> environment variable to point to the root NDK folder.
-Run project generation script:</p>
-<div class="highlight-python"><pre>CmakeGenerateAndroid.bat release</pre>
-</div>
-<p>You need <tt class="code docutils literal"><span class="pre">cmake</span></tt> to be in your PATH.</p>
-<p>Go to <tt class="code docutils literal"><span class="pre">compiler\android-arm64-v8a-release-cmake</span></tt> folder and run:</p>
-<div class="highlight-python"><pre>cmake --build .  -- -j5</pre>
-</div>
-<p>The library binaries will be put to the <tt class="code docutils literal"><span class="pre">bin</span></tt> folder next to the <tt class="code docutils literal"><span class="pre">compiler</span></tt> folder.</p>
-<p><strong>Note:</strong> To be able to build the Android binaries using CMake you need to make sure a certain folders in your NDK point to needed binaries.
-Specifically, you need to create a symlink/copy/rename:</p>
-<div class="highlight-python"><pre>&lt;path_to_android_ndk&gt;/toolchains/aarch64-linux-android-4.9/prebuilt/windows</pre>
-</div>
-<p>to:</p>
-<div class="highlight-python"><pre>&lt;path_to_android_ndk&gt;/toolchains/aarch64-linux-android-4.9/prebuilt/windows-x86_64</pre>
-</div>
-<p>Newer NDK versions might not require doing that at all, but some versions do.</p>
+<p>Configure using the Android NDK toolchain and the same ABI and API level as the PhysX SDK.</p>
 </div>
 </div>
 

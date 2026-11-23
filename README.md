@@ -14,11 +14,6 @@ Features:
 Documentation
 -------------
 
-See ./NvCloth/ReleaseNotes.txt for changes and platform support.
-See ./NvCloth/docs/documentation/index.html for the release notes, API users guide and compiling instructions.
-See ./NvCloth/docs/doxy/index.html for the api documentation.
+See the [documentation](docs/documentation/index.html), [API reference](docs/doxy/index.html), and [release notes](ReleaseNotes.txt).
 
-PhysX / PxShared compatibility
------------------------------------
-Note that 1.1.6 is compatible with the same version of PxShared shipped with PhysX 4.0.
-Please use 1.1.5 if you are compiling it together with PhysX 3.4.
+Building requires CMake 4.3 or newer and a PhysX 5 SDK that exports `PhysX::PhysXFoundation`. See the [compilation guide](docs/documentation/Compiling/index.html) for build and installation instructions.
