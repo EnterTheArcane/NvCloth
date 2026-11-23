@@ -359,7 +359,7 @@ if(WIN32 AND BUILD_SHARED_LIBS)
 endif()
 
 install(
-    FILES license.txt
+    FILES LICENSE.txt
     DESTINATION "${CMAKE_INSTALL_DATADIR}/licenses/NvCloth"
 )
 
