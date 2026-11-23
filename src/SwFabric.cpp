@@ -30,9 +30,10 @@
 #include "SwFabric.h"
 #include "SwFactory.h"
 #include "ps/PsSort.h"
+#include "ps/PsUtilities.h"
+
 #include "limits.h" // for USHRT_MAX
 #include <algorithm>
-#include "../../src/ps/PsUtilities.h"
 
 using namespace nv;
 using namespace physx;

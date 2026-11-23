@@ -38,12 +38,7 @@ target_sources(NvCloth
         FILE_SET HEADERS
         BASE_DIRS
             include
-            extensions/include
         FILES
-            extensions/include/NvClothExt/ClothFabricCooker.h
-            extensions/include/NvClothExt/ClothMeshDesc.h
-            extensions/include/NvClothExt/ClothMeshQuadifier.h
-            extensions/include/NvClothExt/ClothTetherCooker.h
             include/NvCloth/Allocator.h
             include/NvCloth/Callbacks.h
             include/NvCloth/Cloth.h
@@ -68,14 +63,18 @@ target_sources(NvCloth
             include/NvCloth/ps/windows/PsWindowsIntrinsics.h
             include/NvCloth/Range.h
             include/NvCloth/Solver.h
+            include/NvClothExt/ClothFabricCooker.h
+            include/NvClothExt/ClothMeshDesc.h
+            include/NvClothExt/ClothMeshQuadifier.h
+            include/NvClothExt/ClothTetherCooker.h
 
     PRIVATE
-        extensions/src/ClothFabricCooker.cpp
-        extensions/src/ClothGeodesicTetherCooker.cpp
-        extensions/src/ClothMeshQuadifier.cpp
-        extensions/src/ClothSimpleTetherCooker.cpp
         src/Allocator.cpp
         src/Callbacks.cpp
+        src/ext/ClothFabricCooker.cpp
+        src/ext/ClothGeodesicTetherCooker.cpp
+        src/ext/ClothMeshQuadifier.cpp
+        src/ext/ClothSimpleTetherCooker.cpp
         src/Factory.cpp
         src/PhaseConfig.cpp
         src/ps/PsAllocator.cpp
@@ -100,7 +99,6 @@ target_include_directories(NvCloth
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
     PRIVATE
         src
-        extensions/src
 )
 target_compile_definitions(NvCloth
     PRIVATE

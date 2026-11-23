@@ -28,8 +28,9 @@
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.
 
 #include "TripletScheduler.h"
+#include "ps/PsUtilities.h"
+
 #include <algorithm>
-#include "../../src/ps/PsUtilities.h"
 
 using namespace physx;
 using namespace nv;
