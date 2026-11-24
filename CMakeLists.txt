@@ -332,23 +332,24 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion
 )
 
-set(nvcloth_install_config "$<LOWER_CASE:$<CONFIG>>")
+set(nvcloth_install_config_dir "$<$<BOOL:${nvcloth_multi_config}>:$<LOWER_CASE:$<CONFIG>>>")
+
 install(
     TARGETS NvCloth
     EXPORT NvClothTargets
     RUNTIME
-        DESTINATION "${CMAKE_INSTALL_BINDIR}/${nvcloth_install_config}"
+        DESTINATION "${CMAKE_INSTALL_BINDIR}/${nvcloth_install_config_dir}"
     LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/${nvcloth_install_config}"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/${nvcloth_install_config_dir}"
     ARCHIVE
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/${nvcloth_install_config}"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/${nvcloth_install_config_dir}"
     FILE_SET HEADERS
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 if(WIN32 AND BUILD_SHARED_LIBS)
     install(
         FILES "$<TARGET_PDB_FILE:NvCloth>"
-        DESTINATION "${CMAKE_INSTALL_BINDIR}/${nvcloth_install_config}"
+        DESTINATION "${CMAKE_INSTALL_BINDIR}/${nvcloth_install_config_dir}"
         OPTIONAL
     )
 endif()
