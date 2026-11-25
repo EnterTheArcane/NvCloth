@@ -116,6 +116,15 @@ if(BUILD_SHARED_LIBS)
         PRIVATE
             NV_CLOTH_EXPORTS
     )
+    if(EMSCRIPTEN)
+        target_link_options(NvCloth PRIVATE -pthread -sSHARED_MEMORY=1)
+    elseif(NOT DEFINED CMAKE_INSTALL_RPATH)
+        if(APPLE)
+            set_property(TARGET NvCloth PROPERTY INSTALL_RPATH "@loader_path")
+        elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR ANDROID)
+            set_property(TARGET NvCloth PROPERTY INSTALL_RPATH "$ORIGIN")
+        endif()
+    endif()
 else()
     target_compile_definitions(NvCloth
         PUBLIC
