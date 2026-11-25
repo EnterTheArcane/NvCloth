@@ -125,6 +125,8 @@ endif()
 
 set_target_properties(NvCloth
     PROPERTIES
+        CXX_MODULE_STD OFF
+        CXX_SCAN_FOR_MODULES OFF
         POSITION_INDEPENDENT_CODE ON
 )
 
